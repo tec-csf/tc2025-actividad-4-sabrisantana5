@@ -1,3 +1,10 @@
+//
+//  main.c
+//  Actividad 4 procesos
+//  Reforzar los conocimientos relacionados con la creación y manipulación de procesos en el lenguaje C.
+//  Created by Sabrina Santana Lazos on 9/6/20.
+//  Copyright © 2020 Sabrina Santana Lazos. All rights reserved.
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,19 +36,21 @@ void printHistograma(histograma * hist, int maximo, int cantidad){
         i = 0;
         printf("%d \t\t %d \t\t", aux->pidHijo,aux->promedio);
         relacion = relacionHistograma(maximo);
+				//Imprimir asteriscos de acuerdo a la relacion del maximo
         while(i<(aux->promedio)/relacion){
             printf("*");
             i++;
         }
         printf("\n");
         aux++;
+				//Imprimir hasta el último hijo que se pudo crear
         if(aux->pidHijo==0){
           aux = final;
         }
     }
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, char **argv) {
 
     int estado, c, index, cant2;
     int total = 0, i = 0, maximo = 0;
@@ -50,12 +59,13 @@ int main(int argc, const char * argv[]) {
 
 
     //Para recibir como argumento en la línea de comandos el número de procesos hijos a crear (opción -n).
-    while ((c = getopt (argc, argv, "n:")) != -1)
+    while ((c = getopt (argc, argv, "n:")) != -1){
+			printf("Actividad 4: Procesos. Ingrese un valor por consola con la opcion -n ENTERO, si ingresa un valor FLOAT se tomará como entero redondeado hacia abajo\n\n");
         switch (c)
     {
         case 'n':
             cvalue = optarg;
-            //Validar que el valor especificado sea un nuúmero entero
+            //Validar que el valor especificado sea un número entero
             if(isdigit(*cvalue)!=0){
               cant2 = atoi(optarg);
             } else{
@@ -75,11 +85,13 @@ int main(int argc, const char * argv[]) {
         default:
             abort ();
     }
+	}
 
+		//Cuando la opcion no es -n
     for (index = optind; index < argc; index++)
-        printf ("El argumento no es una opción válida %s\n", argv[index]);
+        printf ("El argumento no es una opción válida %s, Opción válida: -n entero\n", argv[index]);
 
-
+		//Variables para los pids y el histograma
     pid_t * pids = (pid_t *)malloc(sizeof(pid_t)*cant2);
     pid_t * inicio = pids;
     pid_t * fin = pids + cant2;
@@ -93,6 +105,7 @@ int main(int argc, const char * argv[]) {
 
         //Error al generar proceso hijo
         if (*inicio == -1) {
+						//Esperar a que los hijos anteriores al error acaben de imprimir
             sleep(1);
             printf("\nError al crear hijo \n");
             printf("\nHijos creados hasta el momento: %d \n", i);
@@ -113,6 +126,7 @@ int main(int argc, const char * argv[]) {
         i++;
     }
 
+		//Esperar a que se impriman todos los hijos
     sleep(3);
 
     inicio = pids;
@@ -139,6 +153,7 @@ int main(int argc, const char * argv[]) {
     //Padre muestra tabla de histograma
     printHistograma(hist,maximo,cant2);
 
+		//Liberar memoria
     free(pids);
     free(hist);
     return 0;
